@@ -5,8 +5,6 @@ void acquire_dongles(t_coder *coder)
     t_dongle    *first;
     t_dongle    *second;
 
-    // Quebra de simetria: o último coder pega na ordem inversa
-    // Isso impede que todo mundo espere em círculo pelo mesmo lado
     if (coder->id == coder->sim->nb_coders)
     {
         first = coder->right;
