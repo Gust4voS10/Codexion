@@ -15,6 +15,7 @@ typedef struct s_dongle
     pthread_cond_t  cond;
     int             is_free;
     long            released_at_ms;
+    void            *wait_queue;
 }   t_dongle;
 
 typedef struct s_coder
@@ -52,11 +53,25 @@ typedef struct s_dongle
 {
     int             id;
     pthread_mutex_t lock;
-    pthread_cond_t  cond;           // campainha: avisa quando o dongle for liberado
+    pthread_cond_t  cond;
     int             is_free;
     long            released_at_ms;
 }   t_dongle;
 
+typedef struct s_fifo_queue
+{
+    int     *ids;
+    int     capacity;
+    int     front;
+    int     count;
+}   t_fifo_queue;
+
+typedef struct s_heap
+{
+    t_coder **data;
+    int     size;
+    int     capacity;
+}   t_heap;
 
 
 #endif
