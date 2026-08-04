@@ -27,9 +27,13 @@ void request_dongle(t_coder *coder, t_dongle *dongle)
 {
     pthread_mutex_lock(&dongle->lock);
 
-    while (!dongle_is_available(dongle, coder->sim->dongle_cooldown))
+    sched_enqueue(coder, dongle);
+
+    while (!(dongle_is_available(dongle, coder->sim->dongle_cooldown)
+            && sched_is_my_turn(coder, dongle)))
         pthread_cond_wait(&dongle->cond, &dongle->lock);
 
+    sched_remove_top(coder, dongle);
     dongle->is_free = 0;
 
     pthread_mutex_unlock(&dongle->lock);
