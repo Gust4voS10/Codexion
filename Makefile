@@ -13,7 +13,7 @@ SRCS		= main.c \
 			  cleanup.c \
 			  utils.c \
 			  logger.c \
-			  dongle.c \
+			  dongles.c \
 			  coder.c \
 			  monitor.c \
 			  scheduler.c \
