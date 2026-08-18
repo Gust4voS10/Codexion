@@ -1,9 +1,10 @@
 #include "codexion.h"
 
-// Retorna 1 se conseguiu pegar os dois dongles, ou 0 se desistiu
-// porque a simulação terminou (ex: outro coder queimou) enquanto
-// esperava. Se conseguiu só o primeiro dongle e a simulação acabou
-// antes do segundo, devolve o primeiro antes de retornar.
+// Returns 1 if the coder successfully acquired both dongles, or 0 if it
+// gave up because the simulation ended (for example, another coder burned
+// out) while waiting. If it acquired only the first dongle and the
+// simulation ended before the second, it releases the first before
+// returning.
 int acquire_dongles(t_coder *coder)
 {
     t_dongle    *first;
@@ -33,8 +34,12 @@ int acquire_dongles(t_coder *coder)
     return (1);
 }
 
-// Monta um timestamp absoluto "daqui a ms_from_now milissegundos",
-// no formato que pthread_cond_timedwait exige (struct timespec).
+// Builds an absolute timeout timestamp representing "ms_from_now"
+// milliseconds from now, in the format required by pthread_cond_timedwait
+// (struct timespec).
+// Builds an absolute timeout timestamp representing "ms_from_now"
+// milliseconds from now, in the format required by pthread_cond_timedwait
+// (struct timespec).
 static void build_timeout(struct timespec *ts, long ms_from_now)
 {
     clock_gettime(CLOCK_REALTIME, ts);
@@ -47,6 +52,8 @@ static void build_timeout(struct timespec *ts, long ms_from_now)
     }
 }
 
+// Attempts to acquire a dongle for the coder, waiting with a timeout
+// to handle cooldown expiration and simulation termination.
 int request_dongle(t_coder *coder, t_dongle *dongle)
 {
     struct timespec ts;
@@ -55,17 +62,17 @@ int request_dongle(t_coder *coder, t_dongle *dongle)
 
     sched_enqueue(coder, dongle);
 
-    // Usamos cond_timedwait (em vez de cond_wait) porque o cooldown
-    // expira "sozinho", sem que ninguém chame signal/broadcast nesse
-    // momento. Se usássemos cond_wait puro, a thread poderia dormir
-    // para sempre esperando um sinal que nunca chegaria, mesmo com
-    // o dongle já disponível. Acordar a cada poucos ms garante que a
-    // condição (incluindo o cooldown) seja sempre reavaliada.
+    // We use cond_timedwait instead of cond_wait because the cooldown
+    // expires "on its own" without any signal/broadcast at that moment.
+    // If we used plain cond_wait, the thread could sleep forever waiting
+    // for a signal that would never arrive, even though the dongle is
+    // already available. Waking every few milliseconds ensures the
+    // condition (including cooldown) is always rechecked.
     //
-    // Também checamos sim_is_over: sem isso, se a simulação terminar
-    // (ex: outro coder queimou) enquanto este coder espera um dongle
-    // que nunca vai chegar, ele ficaria preso aqui para sempre, e o
-    // programa nunca conseguiria terminar (pthread_join travado).
+    // We also check sim_is_over: without this, if the simulation ends
+    // (for example, another coder burned out) while this coder is waiting
+    // for a dongle that will never appear, it would remain stuck here
+    // forever and the program would never complete (pthread_join hung).
     while (!(dongle_is_available(dongle, coder->sim->dongle_cooldown)
             && sched_is_my_turn(coder, dongle)))
     {
@@ -85,6 +92,8 @@ int request_dongle(t_coder *coder, t_dongle *dongle)
     return (1);
 }
 
+// Returns 1 if the dongle is free and its cooldown period has expired.
+// Returns 1 if the dongle is free and its cooldown period has expired.
 int dongle_is_available(t_dongle *dongle, long cooldown)
 {
     long    now;
@@ -97,6 +106,8 @@ int dongle_is_available(t_dongle *dongle, long cooldown)
     return (1);
 }
 
+// Releases the dongle, updates its timestamp, and notifies waiting coders.
+// Releases the dongle, updates its release timestamp, and notifies waiters.
 void release_dongle(t_dongle *dongle)
 {
     pthread_mutex_lock(&dongle->lock);

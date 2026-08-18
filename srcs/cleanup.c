@@ -1,5 +1,6 @@
 #include "codexion.h"
 
+// Destroys the dongle wait queue using the active scheduler type.
 static void destroy_wait_queue(t_sim *sim, t_dongle *dongle)
 {
     if (sim->scheduler_is_edf)
@@ -8,6 +9,7 @@ static void destroy_wait_queue(t_sim *sim, t_dongle *dongle)
         fifo_queue_destroy((t_fifo_queue *)dongle->wait_queue);
 }
 
+// Cleans up all simulation resources, including dongles, coders, and mutexes.
 void cleanup_simulation(t_sim *sim)
 {
     int i;

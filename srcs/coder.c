@@ -1,6 +1,7 @@
 #include "codexion.h"
 
 
+// Sleeps for a precise duration while checking for simulation end.
 static void precise_sleep(t_sim *sim, long duration_ms)
 {
     long    start;
@@ -14,6 +15,7 @@ static void precise_sleep(t_sim *sim, long duration_ms)
     }
 }
 
+// Main routine for each coder thread, executing compile/debug/refactor cycles.
 void *coder_routine(void *arg)
 {
     t_coder *coder;

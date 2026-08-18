@@ -1,5 +1,7 @@
 #include "codexion.h"
 
+// Creates one thread per coder and a monitor thread.
+// Returns 1 on success, or 0 if any thread creation fails.
 static int create_all_threads(t_sim *sim, pthread_t *monitor)
 {
     int i;
@@ -17,6 +19,8 @@ static int create_all_threads(t_sim *sim, pthread_t *monitor)
     return (1);
 }
 
+// Waits for the monitor thread and all coder threads to finish.
+// Waits for the monitor thread and all coder threads to finish.
 static void join_all_threads(t_sim *sim, pthread_t monitor)
 {
     int i;
@@ -30,6 +34,7 @@ static void join_all_threads(t_sim *sim, pthread_t monitor)
     }
 }
 
+// Entry point for the simulation program.
 int main(int argc, char **argv)
 {
     t_sim       sim;

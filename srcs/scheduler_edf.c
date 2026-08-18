@@ -1,5 +1,6 @@
 #include "codexion.h"
 
+// Creates an EDF heap with the given capacity.
 t_heap *heap_create(int capacity)
 {
     t_heap  *heap;
@@ -18,6 +19,7 @@ t_heap *heap_create(int capacity)
     return (heap);
 }
 
+// Destroys the EDF heap and frees all allocated memory.
 void heap_destroy(t_heap *heap)
 {
     if (!heap)
@@ -26,11 +28,13 @@ void heap_destroy(t_heap *heap)
     free(heap);
 }
 
+// Computes the deadline at which this coder will burn out.
 static long deadline_of(t_coder *coder)
 {
     return (coder->last_compile_start + coder->sim->time_to_burnout);
 }
 
+// Returns 1 if coder a should be scheduled before coder b.
 static int has_priority(t_coder *a, t_coder *b)
 {
     if (deadline_of(a) != deadline_of(b))
@@ -38,6 +42,7 @@ static int has_priority(t_coder *a, t_coder *b)
     return (a->id < b->id);
 }
 
+// Swaps two coder pointers in the heap array.
 static void swap(t_coder **a, t_coder **b)
 {
     t_coder *tmp;
@@ -47,6 +52,7 @@ static void swap(t_coder **a, t_coder **b)
     *b = tmp;
 }
 
+// Pushes a coder into the EDF heap and restores heap order.
 void heap_push(t_heap *heap, t_coder *coder)
 {
     int i;
@@ -65,6 +71,7 @@ void heap_push(t_heap *heap, t_coder *coder)
     }
 }
 
+// Removes and returns the coder with the earliest deadline.
 t_coder *heap_pop(t_heap *heap)
 {
     t_coder *top;
@@ -95,6 +102,7 @@ t_coder *heap_pop(t_heap *heap)
     return (top);
 }
 
+// Returns the coder with the earliest deadline without removing it.
 t_coder *heap_peek(t_heap *heap)
 {
     if (heap->size == 0)

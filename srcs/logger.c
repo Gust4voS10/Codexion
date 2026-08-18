@@ -1,5 +1,6 @@
 #include "codexion.h"
 
+// Logs the current coder state with a timestamp in a thread-safe way.
 void log_state(t_sim *sim, int coder_id, const char *message)
 {
     long    timestamp;

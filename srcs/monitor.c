@@ -1,5 +1,6 @@
 #include "codexion.h"
 
+// Marks the simulation as ended in a thread-safe manner.
 static void end_simulation(t_sim *sim)
 {
     pthread_mutex_lock(&sim->end_lock);
@@ -7,6 +8,7 @@ static void end_simulation(t_sim *sim)
     pthread_mutex_unlock(&sim->end_lock);
 }
 
+// Returns 1 if the coder has exceeded its burnout deadline.
 static int coder_burned_out(t_coder *coder)
 {
     long    elapsed;
@@ -15,6 +17,7 @@ static int coder_burned_out(t_coder *coder)
     return (elapsed > coder->sim->time_to_burnout);
 }
 
+// Returns 1 when all coders have completed the required number of compiles.
 static int everyone_compiled_enough(t_sim *sim)
 {
     int i;
@@ -29,6 +32,7 @@ static int everyone_compiled_enough(t_sim *sim)
     return (1);
 }
 
+// Monitor thread routine that ends the simulation on burnout or completion.
 void *monitor_routine(void *arg)
 {
     t_sim   *sim;

@@ -1,5 +1,6 @@
 #include "codexion.h"
 
+// Initializes simulation parameters from command-line arguments.
 void init_sim_params(t_sim *sim, char **argv)
 {
     sim->nb_coders = atoi(argv[1]);
@@ -13,6 +14,7 @@ void init_sim_params(t_sim *sim, char **argv)
     sim->simulation_over = 0;
 }
 
+// Initializes a single dongle, including its lock, condition, and wait queue.
 static int init_one_dongle(t_sim *sim, t_dongle *dongle, int id)
 {
     dongle->id = id;
@@ -31,6 +33,7 @@ static int init_one_dongle(t_sim *sim, t_dongle *dongle, int id)
     return (1);
 }
 
+// Allocates and initializes all dongles used by the simulation.
 static int init_dongles(t_sim *sim)
 {
     int i;
@@ -52,6 +55,7 @@ static int init_dongles(t_sim *sim)
     return (1);
 }
 
+// Allocates and initializes all coder structures and assigns dongles.
 static int init_coders(t_sim *sim)
 {
     int i;
@@ -81,6 +85,7 @@ static int init_coders(t_sim *sim)
     return (1);
 }
 
+// Initializes the simulation environment, including mutexes, dongles, and coders.
 int init_simulation(t_sim *sim, char **argv)
 {
     init_sim_params(sim, argv);
